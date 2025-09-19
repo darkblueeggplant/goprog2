@@ -2,14 +2,17 @@
 # vi: set ft=ruby :
 ENV['VAGRANT_SERVER_URL'] = 'http://vagrant.elab.pro'
 Vagrant.configure("2") do |config|
-  config.vm.box = "debian/bullseye64"
-  config.vm.box_check_update = false
-  config.vm.hostname = "kafka"
-  config.vm.provision "shell", path: "kafka.sh"
-  config.vm.network "public_network", ip: "192.168.1.151", bridge: "Realtek PCIe GbE Family Controller"
-  config.vm.provider "virtualbox" do |v|
-    v.gui = true
-    v.memory = 2048
-    v.cpus = 1  
+  config.vm.define "kafka" do |kafka|
+    kafka.vm.box = "debian/bullseye64"
+    kafka.vm.box_check_update = false
+    kafka.vm.hostname = "kafka"
+    kafka.vm.provision "shell", path: "kafka.sh"
+    kafka.vm.network "public_network", ip: "192.168.1.151", bridge: "Realtek PCIe GbE Family Controller"
+    kafka.vm.provider "virtualbox" do |v|
+      v.name = "kafka"
+      v.gui = true
+      v.memory = 2048
+      v.cpus = 1  
+    end
   end
 end
