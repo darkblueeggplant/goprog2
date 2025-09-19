@@ -6,7 +6,8 @@ Vagrant.configure("2") do |config|
     kafka.vm.box = "debian/bullseye64"
     kafka.vm.box_check_update = false
     kafka.vm.hostname = "kafka"
-    kafka.vm.provision "shell", path: "kafka.sh"
+    kafka.vm.provision "shell", path: "install-kafka.sh", privileged: true
+    kafka.vm.provision "shell", path: "run-kafka.sh", privileged: false
     kafka.vm.network "public_network", ip: "192.168.1.151", bridge: "Realtek PCIe GbE Family Controller"
     kafka.vm.provider "virtualbox" do |v|
       v.name = "kafka"
