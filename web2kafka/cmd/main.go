@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"log/slog"
 	"net/http"
 	"web2kafka/producer"
 
@@ -19,9 +19,9 @@ func main() {
 			message := "Hello request received from " + clientIP
 			err := producer.KafkaSend("request-received", message)
 			if err != nil {
-				log.Printf("Failed to send to Kafka: %v", err)
+				slog.Error("Failed to send to Kafka", "error", err)
 			} else {
-				log.Printf("Message sent to Kafka successfully")
+				slog.Info("Message sent to Kafka successfully")
 			}
 		}()
 
@@ -36,9 +36,9 @@ func main() {
 			message := "Response sent to client: " + clientIP
 			err := producer.KafkaSend("response-sent", message)
 			if err != nil {
-				log.Printf("Failed to send to Kafka: %v", err)
+				slog.Error("Failed to send to Kafka", "error", err)
 			} else {
-				log.Printf("Second message sent to Kafka successfully")
+				slog.Info("Second message sent to Kafka successfully")
 			}
 		}()
 	})
@@ -49,6 +49,6 @@ func main() {
 		})
 	})
 
-	log.Println("Starting server on :8080")
+	slog.Info("Starting server on :8080")
 	r.Run(":8080")
 }
