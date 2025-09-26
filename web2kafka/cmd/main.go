@@ -14,9 +14,13 @@ func main() {
 	r.GET("/hello", func(c *gin.Context) {
 		clientIP := c.ClientIP()
 
-		// 1. Отправляем сообщение о получении запроса
+		// 1. Отправляем сообщение о получении запроса со всеми деталями
 		go func() {
-			message := "Hello request received from " + clientIP
+			message := "Request: " + c.Request.Method + " " + c.Request.URL.Path +
+				" from " + clientIP +
+				" | Agent: " + c.Request.UserAgent() +
+				" | Query: " + c.Request.URL.RawQuery
+
 			err := producer.KafkaSend("request-received", message)
 			if err != nil {
 				slog.Error("Failed to send to Kafka", "error", err)
@@ -25,15 +29,18 @@ func main() {
 			}
 		}()
 
-		// 2. Всегда отвечаем "Hello!" без имени
+		// 2. Отвечаем клиенту
 		c.JSON(http.StatusOK, gin.H{
-			"message": "Hello!", // Всегда просто "Hello!"
+			"message": "Hello!",
 			"status":  "success",
 		})
 
 		// 3. Отправляем сообщение об отправке ответа
 		go func() {
-			message := "Response sent to client: " + clientIP
+			message := "Response: 200 OK to " + clientIP +
+				" | Method: " + c.Request.Method +
+				" | Path: " + c.Request.URL.Path
+
 			err := producer.KafkaSend("response-sent", message)
 			if err != nil {
 				slog.Error("Failed to send to Kafka", "error", err)
